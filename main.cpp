@@ -8,7 +8,7 @@
 
 color ray_color(const ray& r, const hittable_list& world) {
     hit_record rec;
-    if (world.hit(r, 0.00, infinity, rec)) {
+    if (world.hit(r, interval(0.00, infinity), rec)) {
         return 0.5*color(rec.normal + vec3(1,1,1));
     }
 
