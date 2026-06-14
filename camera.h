@@ -16,6 +16,7 @@ class camera {
 public:
     double aspect_ratio = 16.0 / 9.0;
     int image_width = 400;
+    int samples_per_pixel = 10;
 
     camera()=default;
 
@@ -25,12 +26,12 @@ public:
         for (int j = 0; j < image_height; j++) {
             std::clog << "\rScanline's remaining: " << (image_height - j) << '\n' << std::flush;
             for (int i = 0; i < image_width; i++) {
-                auto pixel_center = pixel00_loc + pixel_delta_u * i + pixel_delta_v * j;
-                auto ray_direction = unit_vector(pixel_center - center);
-                ray r{center, ray_direction};
-
-                color pixel_color = ray_color(r, world);
-                write_color(std::cout, pixel_color);
+                color pixel_color(0, 0, 0);
+                for (int sample = 0; sample < samples_per_pixel; sample++) {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, world);
+                }
+                write_color(std::cout, pixel_samples_scale * pixel_color);
             }
         }
         std::clog << "Done." << "\n";
@@ -39,6 +40,7 @@ public:
 private:
     int image_height; // Rendered image height
     point3 center; // Camera center
+    double pixel_samples_scale;
     point3 pixel00_loc; // Location of pixel 0, 0
     vec3 pixel_delta_u; // Offset to pixel to the right
     vec3 pixel_delta_v; // Offset to pixel below
@@ -55,10 +57,22 @@ private:
         return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
     }
 
+    ray get_ray(int i, int j) const {
+        auto offset = sample_square();
+        auto pixel_sample = pixel00_loc + ((i+offset.x()) * pixel_delta_u) + ((j+offset.y()) * pixel_delta_v);
+        auto ray_origin = center;
+        auto ray_direction =pixel_sample - ray_origin;
+        return ray{ray_origin, ray_direction};
+    }
+
+    vec3 sample_square() const {
+        return vec3(random_double() - 0.5, random_double()- 0.5, 0);
+    }
     void initialize() {
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
 
+        pixel_samples_scale = 1.0 / samples_per_pixel;
         center = point3(0, 0, 0);
 
         auto focal_length = 1.0;
