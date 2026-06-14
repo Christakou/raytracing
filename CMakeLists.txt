@@ -10,7 +10,8 @@ add_executable(raytracing main.cpp
         hittable.h
         sphere.h
         hittable_list.h
-        utils.h)
+        utils.h
+        camera.h)
 
 # Build the raytracer and render the image in one step.
 # Usage: cmake --build <build-dir> --target render

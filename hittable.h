@@ -5,6 +5,8 @@
 #ifndef RAYTRACING_HITTABLE_H
 #define RAYTRACING_HITTABLE_H
 
+#include "utils.h"
+
 class hit_record {
 public:
     point3 p;
