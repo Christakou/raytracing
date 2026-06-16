@@ -59,6 +59,11 @@ class vec3 {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
     }
 
+    bool near_zero() const {
+        auto s = 1e-8;
+        return(std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
+    }
+
 };
 
 using point3 = vec3;
@@ -71,6 +76,11 @@ inline vec3 operator+(const vec3& u, const vec3& v) {
     return {u[0]+v[0], u[1]+v[1], u[2]+v[2]};
 }
 
+inline vec3 operator*(const vec3& u, const vec3& v) {
+    return vec3{u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]};
+}
+
+
 inline vec3 operator-(const vec3& u, const vec3& v) {
     return {u[0]-v[0], u[1]-v[1], u[2]-v[2]};
 }
@@ -82,6 +92,8 @@ inline vec3 operator*(const double t, const vec3& v) {
 inline vec3 operator*(const vec3& v, const double t) {
     return t*v;
 }
+
+
 inline vec3 operator/(const vec3& v, const double t) {
     return (1/t)*v;
 }
@@ -93,6 +105,17 @@ inline vec3 cross(const vec3& u, const vec3& v) {
 }
 inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
+}
+
+inline vec3 reflect(const vec3& v, const vec3& n) {
+    return v - 2*dot(v, n)*n;
+}
+
+inline vec3 refract(const vec3& v, const vec3& n, double etai_over_etat) {
+    auto cos_theta = dot(-v, n);
+    auto r_out_perp = etai_over_etat * (v + cos_theta*n);
+    auto r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared()));
+    return r_out_perp + r_out_parallel*n;
 }
 
 inline vec3 random_unit_vector() {

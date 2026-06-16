@@ -13,7 +13,8 @@ add_executable(raytracing main.cpp
         utils.h
         interval.h
         camera.h
-    )
+        material.h
+)
 
 # Build the raytracer and render the image in one step.
 # Usage: cmake --build <build-dir> --target render
